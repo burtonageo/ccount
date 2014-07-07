@@ -32,14 +32,18 @@ main = do
   fname <- case safeIndex args 0 of
              Nothing -> putStrLn "usage: ccount [file]" >> exitFailure
              Just f  -> return f
-  res   <- (try $ withFile fname ReadMode $
-             \h -> hGetContents h >>= (return            .
-                                       concat            .
-                                       intersperse ", "  .
-                                       map showCharCount .
-                                       getSortedElems    .
-                                       countUniqueElems  .
-                                       filter (/= '\n'))) :: IO (Either IOException String)
+  machineOutput <- case safeIndex args 1 of
+                     Nothing -> return False
+                     Just s  -> if s == "--machine-output" then return True else return False
+  res <- (try $ withFile fname ReadMode $
+           \h -> hGetContents h >>= (putStrLn .
+                                     (if machineOutput then show
+                                                       else concat             .
+                                                            intersperse ", "   .
+                                                            map showCharCount) .
+                                     getSortedElems                                .
+                                     countUniqueElems                              .
+                                     filter (/= '\n'))) :: IO (Either IOException ())
   case res of
-    Right answer -> putStrLn answer
-    Left except  -> (putStrLn $ "Could not open file: " ++ fname) >> exitFailure
+    Right _ -> return ()
+    Left  _ -> (putStrLn $ "Could not open file: " ++ fname) >> exitFailure
