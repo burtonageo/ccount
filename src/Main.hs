@@ -36,13 +36,13 @@ main = do
                      Nothing -> return False
                      Just s  -> if s == "--machine-output" then return True else return False
   res <- (try $ withFile fname ReadMode $
-           \h -> hGetContents h >>= (putStrLn .
+           \h -> hGetContents h >>= (putStrLn                                  .
                                      (if machineOutput then show
                                                        else concat             .
                                                             intersperse ", "   .
                                                             map showCharCount) .
-                                     getSortedElems                                .
-                                     countUniqueElems                              .
+                                     getSortedElems                            .
+                                     countUniqueElems                          .
                                      filter (/= '\n'))) :: IO (Either IOException ())
   case res of
     Right _ -> return ()
