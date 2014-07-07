@@ -28,18 +28,22 @@ countUniqueElems (x:xs) = HM.unionWith (+) (HM.singleton x 1) (countUniqueElems 
 
 main :: IO ()
 main = do
-  args  <- getArgs
-  fname <- case safeIndex args 0 of
-             Nothing -> putStrLn "usage: ccount [file]" >> exitFailure
-             Just f  -> return f
-  res   <- (try $ withFile fname ReadMode $
-             \h -> hGetContents h >>= (return            .
-                                       concat            .
-                                       intersperse ", "  .
-                                       map showCharCount .
-                                       getSortedElems    .
-                                       countUniqueElems  .
-                                       filter (/= '\n'))) :: IO (Either IOException String)
+  args          <- getArgs
+  fname         <- case safeIndex args 0 of
+                     Nothing -> putStrLn "usage: ccount [file]" >> exitFailure
+                     Just f  -> return f
+  machineOutput <- case safeIndex args 1 of
+                     Nothing -> return False
+                     Just s  -> if s == "--machine-output" then return True else return False
+  res           <- (try $ withFile fname ReadMode $
+                     \h -> hGetContents h >>= ((if machineOutput then (return . show)
+                                                                 else (return            .
+                                                                       concat            .
+                                                                       intersperse ", "  .
+                                                                       map showCharCount)) .
+                                                getSortedElems   .
+                                                countUniqueElems .
+                                                filter (/= '\n'))) :: IO (Either IOException String)
   case res of
     Right answer -> putStrLn answer
     Left except  -> (putStrLn $ "Could not open file: " ++ fname) >> exitFailure
