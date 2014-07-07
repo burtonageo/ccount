@@ -28,7 +28,6 @@ countUniqueElems (x:xs) = HM.unionWith (+) (HM.singleton x 1) (countUniqueElems 
 
 main :: IO ()
 main = do
-<<<<<<< HEAD
   args  <- getArgs
   fname <- case safeIndex args 0 of
              Nothing -> putStrLn "usage: ccount [file]" >> exitFailure
@@ -45,7 +44,6 @@ main = do
                                      getSortedElems                            .
                                      countUniqueElems                          .
                                      filter (/= '\n'))) :: IO (Either IOException ())
-=======
   args          <- getArgs
   fname         <- case safeIndex args 0 of
                      Nothing -> putStrLn "usage: ccount [file]" >> exitFailure
@@ -62,7 +60,6 @@ main = do
                                                 getSortedElems   .
                                                 countUniqueElems .
                                                 filter (/= '\n'))) :: IO (Either IOException String)
->>>>>>> d8c891d9de10f4f2a2938ce7bbfa2804fb478440
   case res of
     Right _ -> return ()
     Left  _ -> (putStrLn $ "Could not open file: " ++ fname) >> exitFailure
