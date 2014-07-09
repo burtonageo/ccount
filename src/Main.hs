@@ -44,22 +44,6 @@ main = do
                                      getSortedElems                            .
                                      countUniqueElems                          .
                                      filter (/= '\n'))) :: IO (Either IOException ())
-  args          <- getArgs
-  fname         <- case safeIndex args 0 of
-                     Nothing -> putStrLn "usage: ccount [file]" >> exitFailure
-                     Just f  -> return f
-  machineOutput <- case safeIndex args 1 of
-                     Nothing -> return False
-                     Just s  -> if s == "--machine-output" then return True else return False
-  res           <- (try $ withFile fname ReadMode $
-                     \h -> hGetContents h >>= ((if machineOutput then (return . show)
-                                                                 else (return            .
-                                                                       concat            .
-                                                                       intersperse ", "  .
-                                                                       map showCharCount)) .
-                                                getSortedElems   .
-                                                countUniqueElems .
-                                                filter (/= '\n'))) :: IO (Either IOException String)
   case res of
     Right _ -> return ()
     Left  _ -> (putStrLn $ "Could not open file: " ++ fname) >> exitFailure
